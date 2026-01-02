@@ -127,6 +127,10 @@ target_sources(${PLUGIN_NAME}
         Source/PluginProcessor.h
         Source/PluginEditor.cpp
         Source/PluginEditor.h
+        Source/parameters/Parameters.cpp
+        Source/parameters/Parameters.h
+        Source/ui/MainView.cpp
+        Source/ui/MainView.h
 )
 
 # Include directories

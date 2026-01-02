@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "parameters/Parameters.h"
 
 //==============================================================================
 /**
@@ -46,7 +47,13 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    //==============================================================================
+    Parameters& getParameters() { return parameters; }
+    const Parameters& getParameters() const { return parameters; }
+
 private:
     //==============================================================================
+    Parameters parameters;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginTemplateAudioProcessor)
 };

@@ -109,8 +109,13 @@ void PluginTemplateAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // Process audio here
-    // This is a template - add your processing logic
+    // Apply gain
+    const auto gainValue = parameters.getGain();
+    if (gainValue != 1.0f)
+    {
+        for (int channel = 0; channel < totalNumInputChannels; ++channel)
+            buffer.applyGain (channel, 0, buffer.getNumSamples(), gainValue);
+    }
 }
 
 //==============================================================================
@@ -127,12 +132,15 @@ juce::AudioProcessorEditor* PluginTemplateAudioProcessor::createEditor()
 //==============================================================================
 void PluginTemplateAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    juce::ignoreUnused (destData);
-    // You should use this method to store your parameters in the memory block.
+    juce::ValueTree state ("PluginState");
+    parameters.getState (state);
+    juce::MemoryOutputStream mos (destData, true);
+    state.writeToStream (mos);
 }
 
 void PluginTemplateAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    juce::ignoreUnused (data, sizeInBytes);
-    // You should use this method to restore your parameters from this memory block.
+    auto tree = juce::ValueTree::readFromData (data, static_cast<size_t> (sizeInBytes));
+    if (tree.isValid())
+        parameters.setState (tree);
 }
