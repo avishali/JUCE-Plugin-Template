@@ -88,8 +88,10 @@ endif()
 project(${PLUGIN_NAME} VERSION ${PLUGIN_VERSION_MAJOR}.${PLUGIN_VERSION_MINOR}.${PLUGIN_VERSION_PATCH} LANGUAGES C CXX)
 
 # Set C++ standard
+# ADD — CMakeLists.txt (root), after project(...)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Add CMake module path (for custom find scripts)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
@@ -100,6 +102,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 # place build artifacts for JUCE, but the source files remain in the original SDK location.
 # EXCLUDE_FROM_ALL prevents JUCE targets from being built unless they're dependencies.
 add_subdirectory("${JUCE_PATH}" "${CMAKE_CURRENT_BINARY_DIR}/JUCE" EXCLUDE_FROM_ALL)
+
+# Add ui_core library
+add_subdirectory(ui_core)
 
 # ==============================================================================
 # PLUGIN TARGET
@@ -132,6 +137,8 @@ target_sources(${PLUGIN_NAME}
         Source/ui/MainView.cpp
         Source/ui/MainView.h
 )
+# ADD — CMakeLists.txt (root), after juce_add_plugin(...)
+target_compile_features(${PLUGIN_NAME} PUBLIC cxx_std_17)
 
 # Include directories
 target_include_directories(${PLUGIN_NAME}
@@ -153,6 +160,7 @@ target_link_libraries(${PLUGIN_NAME}
         juce::juce_audio_utils
         juce::juce_gui_basics
         juce::juce_dsp
+        ui_core
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
