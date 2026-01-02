@@ -3,6 +3,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "../PluginProcessor.h"
 #include <ui_core/UiCore.h>
+#include "hardware/PluginHardwareAdapter.h"
+#include <memory>
 
 //==============================================================================
 /**
@@ -27,6 +29,7 @@ private:
 
     ui_core::FocusManager focusManager;
     ui_core::BindingRegistry bindingRegistry;
+    std::unique_ptr<PluginHardwareAdapter> hardwareAdapter;
 
     // Focus state for this view (only for verification now)
     bool gainFocused = false;

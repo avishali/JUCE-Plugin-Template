@@ -5,6 +5,7 @@
 #include <ui_core/UiCore.h>
 
 #include "PluginProcessor.h"
+#include "ui/MainView.h"
 
 //==============================================================================
 /**

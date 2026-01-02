@@ -136,6 +136,8 @@ target_sources(${PLUGIN_NAME}
         Source/parameters/Parameters.h
         Source/ui/MainView.cpp
         Source/ui/MainView.h
+        Source/hardware/PluginHardwareAdapter.cpp
+        Source/hardware/PluginHardwareAdapter.h
 )
 # ADD — CMakeLists.txt (root), after juce_add_plugin(...)
 target_compile_features(${PLUGIN_NAME} PUBLIC cxx_std_17)

@@ -28,16 +28,21 @@ MainView::MainView (PluginTemplateAudioProcessor& p)
     gainFocusAdapter.repaintTarget = this;
     focusManager.registerWidget (kGainControlId, &gainFocusAdapter);
 
-    // Add binding to registry
-    bindingRegistry.add (ui_core::makeBinding (
+    // Add binding to registry (mapped: native 0..2, normalized 0..1)
+    bindingRegistry.add (ui_core::makeMappedBinding (
         kGainControlId,
         [this]() { return audioProcessor.getParameters().getGain(); },
-        [this](float v)
+        [this](float native)
         {
-            audioProcessor.getParameters().setGain (v);
+            audioProcessor.getParameters().setGain (native);
             // keep UI in sync without recursion
-            gainSlider.setValue (v, juce::dontSendNotification);
-        }));
+            gainSlider.setValue (native, juce::dontSendNotification);
+        },
+        [](float normalized) { return normalized * 2.0f; },      // toNative: 0..1 -> 0..2
+        [](float native) { return native / 2.0f; }));            // toNormalized: 0..2 -> 0..1
+
+    // Create hardware adapter
+    hardwareAdapter = std::make_unique<PluginHardwareAdapter> (bindingRegistry);
 
     setSize (400, 300);
 }
@@ -75,11 +80,20 @@ bool MainView::keyPressed (const juce::KeyPress& key)
     auto ch = key.getTextCharacter();
     if (ch == 'h' || ch == 'H')
     {
-        if (auto* b = bindingRegistry.find (kGainControlId))
-        {
-            b->set (0.75f);
-            DBG ("Gain set via binding registry");
-        }
+        ui_core::HardwareControlEvent e { kGainControlId, 0.375f, false };
+        hardwareAdapter->processEvent (e);
+        return true;
+    }
+    if (ch == 'j' || ch == 'J')
+    {
+        ui_core::HardwareControlEvent e { kGainControlId, 0.025f, true };
+        hardwareAdapter->processEvent (e);
+        return true;
+    }
+    if (ch == 'k' || ch == 'K')
+    {
+        ui_core::HardwareControlEvent e { kGainControlId, -0.025f, true };
+        hardwareAdapter->processEvent (e);
         return true;
     }
     return false;

@@ -144,3 +144,9 @@ void PluginTemplateAudioProcessor::setStateInformation (const void* data, int si
     if (tree.isValid())
         parameters.setState (tree);
 }
+
+// ADD — Source/PluginProcessor.cpp (very bottom, after all code)
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new PluginTemplateAudioProcessor();
+}
