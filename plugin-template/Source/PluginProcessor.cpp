@@ -1,0 +1,138 @@
+#include "PluginProcessor.h"
+#include "PluginEditor.h"
+
+//==============================================================================
+PluginTemplateAudioProcessor::PluginTemplateAudioProcessor()
+{
+}
+
+PluginTemplateAudioProcessor::~PluginTemplateAudioProcessor()
+{
+}
+
+//==============================================================================
+const juce::String PluginTemplateAudioProcessor::getName() const
+{
+    return JucePlugin_Name;
+}
+
+bool PluginTemplateAudioProcessor::acceptsMidi() const
+{
+   #if JucePlugin_WantsMidiInput
+    return true;
+   #else
+    return false;
+   #endif
+}
+
+bool PluginTemplateAudioProcessor::producesMidi() const
+{
+   #if JucePlugin_ProducesMidiOutput
+    return true;
+   #else
+    return false;
+   #endif
+}
+
+bool PluginTemplateAudioProcessor::isMidiEffect() const
+{
+   #if JucePlugin_IsMidiEffect
+    return true;
+   #else
+    return false;
+   #endif
+}
+
+double PluginTemplateAudioProcessor::getTailLengthSeconds() const
+{
+    return 0.0;
+}
+
+int PluginTemplateAudioProcessor::getNumPrograms()
+{
+    return 1;
+}
+
+int PluginTemplateAudioProcessor::getCurrentProgram()
+{
+    return 0;
+}
+
+void PluginTemplateAudioProcessor::setCurrentProgram (int index)
+{
+    juce::ignoreUnused (index);
+}
+
+const juce::String PluginTemplateAudioProcessor::getProgramName (int index)
+{
+    juce::ignoreUnused (index);
+    return {};
+}
+
+void PluginTemplateAudioProcessor::changeProgramName (int index, const juce::String& newName)
+{
+    juce::ignoreUnused (index, newName);
+}
+
+//==============================================================================
+void PluginTemplateAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+{
+    juce::ignoreUnused (sampleRate, samplesPerBlock);
+}
+
+void PluginTemplateAudioProcessor::releaseResources()
+{
+}
+
+bool PluginTemplateAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+{
+    // Support mono and stereo
+    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
+     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+        return false;
+
+    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+        return false;
+
+    return true;
+}
+
+void PluginTemplateAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+{
+    juce::ignoreUnused (midiMessages);
+
+    juce::ScopedNoDenormals noDenormals;
+    auto totalNumInputChannels  = getTotalNumInputChannels();
+    auto totalNumOutputChannels = getTotalNumOutputChannels();
+
+    // Clear any output channels that don't contain input data
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, buffer.getNumSamples());
+
+    // Process audio here
+    // This is a template - add your processing logic
+}
+
+//==============================================================================
+bool PluginTemplateAudioProcessor::hasEditor() const
+{
+    return true;
+}
+
+juce::AudioProcessorEditor* PluginTemplateAudioProcessor::createEditor()
+{
+    return new PluginTemplateAudioProcessorEditor (*this);
+}
+
+//==============================================================================
+void PluginTemplateAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+{
+    juce::ignoreUnused (destData);
+    // You should use this method to store your parameters in the memory block.
+}
+
+void PluginTemplateAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+{
+    juce::ignoreUnused (data, sizeInBytes);
+    // You should use this method to restore your parameters from this memory block.
+}
