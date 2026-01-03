@@ -6,6 +6,12 @@ It is short by design. If you understand this page, you will not fight the archi
 
 ---
 
+> 🔗 Related documents:  
+> - [README](README.md)  
+> - [Architecture Overview](docs/ARCHITECTURE.md)  
+> - [New Plugin Checklist](NEW_PLUGIN_CHECKLIST.md)
+
+
 ## 1. One source of truth
 
 **Parameters own truth.**

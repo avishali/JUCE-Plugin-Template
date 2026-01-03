@@ -1,3 +1,4 @@
+
 # Architecture Overview
 ### JUCE Plugin Template — Control, Focus, and Hardware Flow
 
@@ -5,6 +6,12 @@ This document provides a **single-source architectural overview** of the JUCE Pl
 It explains *how data flows* and *why responsibilities are separated the way they are*.
 
 If you understand this page, you understand the entire template.
+
+> 🔗 Related documents:  
+> - [README](../README.md)  
+> - [Template Philosophy](../TEMPLATE_PHILOSOPHY.md)  
+> - [New Plugin Checklist](../NEW_PLUGIN_CHECKLIST.md)
+
 
 ---
 
@@ -185,3 +192,5 @@ JUCE is the *toolkit*.
 This architecture is the *system*.
 
 Treat it like a platform, not a project.
+
+

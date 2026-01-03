@@ -272,3 +272,22 @@ This template currently supports:
 - Standalone / AU / VST3
 
 It is considered **stable** and suitable for reuse across projects.
+
+---
+
+## Documentation
+
+For deeper understanding of the template architecture and rules, see:
+
+- 📐 **Architecture Overview**  
+  [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)  
+  How control, focus, hardware input/output, and DSP state flow through the system.
+
+- 🧠 **Template Philosophy**  
+  [`TEMPLATE_PHILOSOPHY.md`](TEMPLATE_PHILOSOPHY.md)  
+  The design principles and non-negotiable rules behind the architecture.
+
+- ✅ **New Plugin Checklist**  
+  [`NEW_PLUGIN_CHECKLIST.md`](NEW_PLUGIN_CHECKLIST.md)  
+  Step-by-step process for creating a new plugin safely from this template.
+

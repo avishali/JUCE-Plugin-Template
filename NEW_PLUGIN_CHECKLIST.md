@@ -4,6 +4,12 @@
 This checklist is designed to be followed **top to bottom** whenever you start a new plugin using this template.
 If you follow these steps in order, you will avoid architectural drift and keep all plugins consistent.
 
+> 🔗 Related documents:  
+> - [README](README.md)  
+> - [Architecture Overview](docs/ARCHITECTURE.md)  
+> - [Template Philosophy](TEMPLATE_PHILOSOPHY.md)
+
+
 ---
 
 ## 1. Repository & Identity
