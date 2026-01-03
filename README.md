@@ -260,6 +260,20 @@ It intentionally avoids:
 4. Reuse platform layers unchanged
 5. Extend hardware I/O as needed
 
+- 📐 **Architecture Overview**  
+  [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)  
+  How control, focus, hardware input/output, and DSP state flow through the system.
+
+- 🧠 **Template Philosophy**  
+  [`TEMPLATE_PHILOSOPHY.md`](TEMPLATE_PHILOSOPHY.md)  
+  The design principles and non-negotiable rules behind the architecture.
+
+- ✅ **New Plugin Checklist**  
+  [`NEW_PLUGIN_CHECKLIST.md`](NEW_PLUGIN_CHECKLIST.md)  
+  Step-by-step process for creating a new plugin safely from this template.
+
+
+
 ---
 
 ## Status
@@ -279,15 +293,14 @@ It is considered **stable** and suitable for reuse across projects.
 
 For deeper understanding of the template architecture and rules, see:
 
-- 📐 **Architecture Overview**  
-  [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)  
-  How control, focus, hardware input/output, and DSP state flow through the system.
+### Docs map
 
-- 🧠 **Template Philosophy**  
-  [`TEMPLATE_PHILOSOPHY.md`](TEMPLATE_PHILOSOPHY.md)  
-  The design principles and non-negotiable rules behind the architecture.
-
-- ✅ **New Plugin Checklist**  
-  [`NEW_PLUGIN_CHECKLIST.md`](NEW_PLUGIN_CHECKLIST.md)  
-  Step-by-step process for creating a new plugin safely from this template.
-
+README.md
+├─ docs/ARCHITECTURE.md
+│ (how the system works)
+│
+├─ TEMPLATE_PHILOSOPHY.md
+│ (why the rules exist)
+│
+└─ NEW_PLUGIN_CHECKLIST.md
+(how to start a new plugin safely)
