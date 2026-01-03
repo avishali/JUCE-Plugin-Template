@@ -291,6 +291,11 @@ It is considered **stable** and suitable for reuse across projects.
 
 ## Documentation
 
+- 🎛 **Control IDs & Hardware Pages**  
+  [`docs/CONTROL_IDS.md`](docs/CONTROL_IDS.md)  
+  How ControlIds are assigned, kept stable, and scaled for future hardware pages.
+
+
 For deeper understanding of the template architecture and rules, see:
 
 ### Docs map
@@ -304,3 +309,5 @@ README.md
 │
 └─ NEW_PLUGIN_CHECKLIST.md
 (how to start a new plugin safely)
+
+

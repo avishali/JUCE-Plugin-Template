@@ -131,6 +131,9 @@ Hardware INPUT (encoders, faders)
 
 > Hardware output is a view, not a controller.
 
+> - [Control IDs & Hardware Pages](CONTROL_IDS.md)
+
+
 ---
 
 ## 4. Focus as a first-class signal
