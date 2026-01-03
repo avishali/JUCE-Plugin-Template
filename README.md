@@ -1,119 +1,274 @@
-# JUCE Plugin Template
+# JUCE Plugin Template  
+### Hardware-Ready, Focus-Aware, Scalable Architecture
 
-A minimal, clean template for creating new JUCE audio plugins using CMake.
+This repository is a **production-ready JUCE plugin template** designed for building modern audio plugins that scale cleanly from simple UI-only tools to **hardware-integrated control-surface workflows**.
 
-## Quick Start
+It is intentionally opinionated and optimized for:
+- Long-term maintainability
+- Explicit ownership of state
+- Hardware-first interaction models
+- Focus-aware UI and control routing
 
-1. **Copy this template** to create your new plugin:
-   ```bash
-   cp -r plugin-template my-new-plugin
-   cd my-new-plugin
-   ```
+This is **not** a demo project or a JUCE tutorial — it is a foundation meant to be copied and evolved.
 
-2. **Update plugin configuration** in `CMakeLists.txt`:
-   - `PLUGIN_NAME` - Your plugin name
-   - `COMPANY_NAME` - Your company name
-   - `PLUGIN_CODE` - 4-character plugin code (e.g., "MyPl")
-   - `MANUFACTURER_CODE` - 4-character manufacturer code (must have at least one uppercase)
+---
 
-3. **Rename source files** (optional but recommended):
-   - `Source/PluginProcessor.h/cpp` → `Source/YourPluginProcessor.h/cpp`
-   - `Source/PluginEditor.h/cpp` → `Source/YourPluginEditor.h/cpp`
-   - Update class names in the files
+## 1. What this template is (and is not)
 
-4. **Set JUCE path**:
-   ```bash
-   export JUCE_PATH=/path/to/JUCE
-   ```
+### ✅ What it *is*
+- A clean JUCE + CMake plugin base
+- Explicit DSP / UI / platform separation
+- Normalized control routing (0..1)
+- Focus-aware UI
+- Hardware input & output abstraction
+- Host-persistent UI state (window size, focus)
+- Suitable for AU / VST3 / Standalone
 
-5. **Build**:
-   ```bash
-   cmake -S . -B build -DJUCE_PATH=$JUCE_PATH
-   cmake --build build
-   ```
+### ❌ What it *is not*
+- Not APVTS-based
+- Not tied to MIDI / HID / OSC specifically
+- Not a JUCE “example” project
+- Not designed for quick hacks or experiments
 
-   Or use CMake presets:
-   ```bash
-   cmake --preset default
-   cmake --build build
-   ```
+---
 
-## Plugin Formats
-
-By default, the template builds:
-- **AU** (macOS)
-- **VST3** (macOS/Windows)
-- **Standalone** (macOS/Windows)
-
-To add AAX support, add `AAX` to `PLUGIN_FORMATS` and set `AAX_SDK_PATH`.
-
-## Structure
+## 2. High-level architecture
 
 ```
-plugin-template/
-├── CMakeLists.txt          # Main build configuration
-├── CMakePresets.json       # CMake presets for common build configs
-├── CMake/
-│   └── CPM.cmake          # CMake package manager (optional)
-├── Source/
-│   ├── PluginProcessor.h  # Audio processor header
-│   ├── PluginProcessor.cpp # Audio processor implementation
-│   ├── PluginEditor.h     # UI editor header
-│   └── PluginEditor.cpp   # UI editor implementation
-└── README.md              # This file
+DSP (Parameters)
+   ↑
+BindingRegistry (normalized 0..1)
+   ↑                ↑
+Hardware Input      Hardware Output
+   ↑                ↑
+Controllers        LEDs / Focus / Displays
 ```
 
-## Customization
+**Core rules:**
+- Parameters own truth
+- Hardware always works in normalized space
+- UI uses native units
+- All routing goes through bindings
 
-### Adding Parameters
+---
 
-The template uses a minimal processor. To add parameters:
-1. Use `juce::AudioProcessorValueTreeState` (APVTS) for parameter management
-2. Or use direct getter/setter methods with `std::atomic` for thread-safe access
+## 3. Project structure
 
-### Adding UI Components
+```
+Source/
+├── parameters/
+│   ├── Parameters.h / .cpp
+│   └── DSP state + persistence (single source of truth)
+│
+├── ui/
+│   ├── MainView.h / .cpp
+│   └── UI, focus, bindings, layout
+│
+├── hardware/
+│   ├── PluginHardwareAdapter.h / .cpp        (input)
+│   ├── PluginHardwareOutputAdapter.h / .cpp  (output)
+│
+ui_core/
+├── FocusManager
+├── BindingRegistry
+├── Hardware contracts
+└── JUCE-free platform layer
+```
 
-1. Add your UI components to `Source/` or create a `Source/ui/` subdirectory
-2. Update `CMakeLists.txt` to include new source files
-3. Implement your UI in `PluginEditor.cpp`
+---
 
-### Adding DSP Code
+## 4. Parameters layer (DSP authority)
 
-1. Add DSP processing in `PluginProcessor::processBlock()`
-2. Use `juce::dsp` modules for common DSP operations
-3. Link additional JUCE modules in `CMakeLists.txt` if needed
+### Responsibilities
+- Own parameter values
+- Clamp and validate
+- Persist plugin + UI state
+- No UI or hardware knowledge
 
-## Build Systems
+### Example pattern
 
-### Ninja (Default)
+```cpp
+void Parameters::setGain (float v) noexcept
+{
+    gain.store (juce::jlimit (0.0f, 2.0f, v));
+}
+```
+
+**Rule:**  
+> Never clamp in the UI. Never clamp in hardware adapters.
+
+---
+
+## 5. BindingRegistry (the routing spine)
+
+### Purpose
+`BindingRegistry` maps **ControlId → parameter behavior** in normalized space.
+
+Each binding defines:
+- How to read a parameter (native → normalized)
+- How to write a parameter (normalized → native)
+
+### Why normalized?
+- Hardware encoders don’t care about dB / Hz / gain
+- Relative encoder math becomes trivial
+- LED rings and displays become consistent
+- Parameter ranges can change without touching hardware logic
+
+---
+
+## 6. Focus system
+
+### Concepts
+- Every interactive control has a `ControlId`
+- `FocusManager` tracks the active control
+- Focus drives:
+  - UI highlight
+  - Hardware focus LEDs
+  - Which control receives encoder input
+
+### Persistence
+The focused control is saved in plugin state and restored on open.
+
+---
+
+## 7. Hardware input
+
+### Input path
+
+```
+HardwareControlEvent
+   → PluginHardwareAdapter
+   → BindingRegistry
+   → Parameters
+```
+
+Supports:
+- Absolute input (faders, touch)
+- Relative input (encoders)
+
+Hardware adapters:
+- Do **not** know parameter ranges
+- Do **not** talk to DSP directly
+- Only operate in normalized space
+
+---
+
+## 8. Hardware output
+
+### Output path
+
+```
+Parameter change / Focus change
+   → PluginHardwareOutputAdapter
+   → LEDs / rings / displays
+```
+
+Current implementation:
+- DBG-based (proof of behavior)
+
+Future implementations:
+- MIDI CC feedback
+- HID controllers
+- OSC / network control
+- Custom hardware devices
+
+---
+
+## 9. UI resizing & persistence
+
+### Resizing
+Editor resizing is **opt-in**, controlled via CMake:
+
 ```bash
-cmake -S . -B build -G Ninja -DJUCE_PATH=$JUCE_PATH
-cmake --build build
+-DPLUGIN_EDITOR_RESIZABLE=ON
 ```
 
-### Xcode
-```bash
-cmake -S . -B build-xcode -G Xcode -DJUCE_PATH=$JUCE_PATH
-open build-xcode/PluginTemplate.xcodeproj
-```
+Default builds are **not resizable**.
 
-### Visual Studio (Windows)
-```bash
-cmake -S . -B build -G "Visual Studio 17 2022" -DJUCE_PATH=$JUCE_PATH
-cmake --build build --config Release
-```
+### Persistence
+- Window size is stored in `Parameters`
+- Host persists it with plugin state
+- Works across sessions and reloads
 
-## Requirements
+---
 
-- CMake 3.22 or higher
-- JUCE framework (latest version recommended)
-- C++17 compatible compiler
-- macOS: Xcode Command Line Tools
-- Windows: Visual Studio 2019 or later
+## 10. How to add a new parameter (checklist)
 
-## Notes
+1. **Add to `Parameters`**
+   - Atomic value
+   - Getter / setter
+   - Persistence
 
-- The template uses minimal JUCE modules: `juce_audio_utils`, `juce_gui_basics`, `juce_dsp`
-- Add more modules as needed in `CMakeLists.txt`
-- The template does not include AAX support by default (requires AAX SDK)
-- All paths use environment variables or CMake cache variables for portability
+2. **Assign a new ControlId**
+   ```cpp
+   constexpr ui_core::ControlId kMyParamId = 1003;
+   ```
+
+3. **Add binding**
+   - Normalized mapping
+   - UI update
+   - Hardware output
+
+4. **Register focus**
+   - FocusManager
+   - Optional focus outline
+
+That’s it. No other layers need changes.
+
+---
+
+## 11. How to add real hardware support
+
+Replace:
+- `PluginHardwareAdapter`
+- `PluginHardwareOutputAdapter`
+
+With implementations for:
+- MIDI
+- HID
+- OSC
+- Network protocols
+
+No changes required in:
+- UI
+- Parameters
+- Bindings
+- Focus system
+
+---
+
+## 12. Template philosophy
+
+This template optimizes for:
+- Explicit ownership
+- Predictable behavior
+- Hardware-first workflows
+- Long-term scalability
+
+It intentionally avoids:
+- Implicit magic
+- Over-abstracted frameworks
+- “JUCE demo” patterns
+
+---
+
+## 13. Recommended workflow
+
+1. Clone or copy this repository
+2. Rename plugin identifiers
+3. Start adding DSP
+4. Reuse platform layers unchanged
+5. Extend hardware I/O as needed
+
+---
+
+## Status
+
+This template currently supports:
+- Multi-parameter focus
+- Hardware input & output abstraction
+- Focus persistence
+- Window size persistence
+- Standalone / AU / VST3
+
+It is considered **stable** and suitable for reuse across projects.

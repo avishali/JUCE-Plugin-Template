@@ -6,12 +6,25 @@ PluginTemplateAudioProcessorEditor::PluginTemplateAudioProcessorEditor (PluginTe
     : AudioProcessorEditor (&p), audioProcessor (p), mainView (p)
 {
     addAndMakeVisible (mainView);
-    setSize (400, 300);
+        // REPLACE — Source/PluginEditor.cpp (inside constructor)
+    setSize (audioProcessor.getParameters().getEditorWidth(),
+    audioProcessor.getParameters().getEditorHeight());
+
+
+         // ADD — PluginTemplateAudioProcessorEditor constructor (Source/PluginEditor.cpp)
+#if PLUGIN_EDITOR_RESIZABLE
+    setResizable (true, true);
+    setResizeLimits (360, 360, 900, 900);
+#endif
+    // END REPLACE  
 }
 
+
 PluginTemplateAudioProcessorEditor::~PluginTemplateAudioProcessorEditor()
-{
+{   
+         
 }
+
 
 //==============================================================================
 void PluginTemplateAudioProcessorEditor::paint (juce::Graphics& g)
@@ -19,7 +32,12 @@ void PluginTemplateAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
+// ADD — Source/PluginEditor.cpp
 void PluginTemplateAudioProcessorEditor::resized()
 {
     mainView.setBounds (getLocalBounds());
+
+#if PLUGIN_EDITOR_RESIZABLE
+    audioProcessor.getParameters().setEditorSize (getWidth(), getHeight());
+#endif
 }

@@ -4,6 +4,7 @@
 #include "../PluginProcessor.h"
 #include <ui_core/UiCore.h>
 #include "hardware/PluginHardwareAdapter.h"
+#include "hardware/PluginHardwareOutputAdapter.h"
 #include <memory>
 
 //==============================================================================
@@ -26,31 +27,42 @@ private:
 
     juce::Label gainLabel;
     juce::Slider gainSlider;
+    juce::Label outputLabel;
+    juce::Slider outputSlider;
 
     ui_core::FocusManager focusManager;
     ui_core::BindingRegistry bindingRegistry;
     std::unique_ptr<PluginHardwareAdapter> hardwareAdapter;
+    std::unique_ptr<PluginHardwareOutputAdapter> hardwareOutput;
 
-    // Focus state for this view (only for verification now)
-    bool gainFocused = false;
+    // Focus state: tracks which control is focused (0 = none)
+    ui_core::ControlId focusedControlId = 0;
 
     // Adapter object that FocusManager can call
     struct FocusFlagAdapter : ui_core::Focusable
     {
-        bool* flag = nullptr;
+        ui_core::ControlId controlId = 0;
+        ui_core::ControlId* focusedControlIdPtr = nullptr;
         juce::Component* repaintTarget = nullptr;
         void setFocused (bool focused) override
         {
-            if (flag)
-                *flag = focused;
+            if (focusedControlIdPtr)
+            {
+                if (focused)
+                    *focusedControlIdPtr = controlId;
+                else if (*focusedControlIdPtr == controlId)
+                    *focusedControlIdPtr = 0;
+            }
             if (repaintTarget)
                 repaintTarget->repaint();
         }
     };
 
     FocusFlagAdapter gainFocusAdapter;
+    FocusFlagAdapter outputFocusAdapter;
 
     void gainSliderChanged();
+    void outputSliderChanged();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainView)
 };

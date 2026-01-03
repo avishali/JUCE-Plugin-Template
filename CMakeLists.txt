@@ -96,6 +96,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Add CMake module path (for custom find scripts)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
+# ADD — CMakeLists.txt (root)
+option(PLUGIN_EDITOR_RESIZABLE "Enable mouse-resizable plugin editor" OFF)
+
 # Add JUCE
 # IMPORTANT: This references JUCE from the SDK path, it does NOT copy it.
 # The second parameter "${CMAKE_CURRENT_BINARY_DIR}/JUCE" tells CMake where to
@@ -138,6 +141,8 @@ target_sources(${PLUGIN_NAME}
         Source/ui/MainView.h
         Source/hardware/PluginHardwareAdapter.cpp
         Source/hardware/PluginHardwareAdapter.h
+        Source/hardware/PluginHardwareOutputAdapter.cpp
+        Source/hardware/PluginHardwareOutputAdapter.h
 )
 # ADD — CMakeLists.txt (root), after juce_add_plugin(...)
 target_compile_features(${PLUGIN_NAME} PUBLIC cxx_std_17)
@@ -155,6 +160,13 @@ target_compile_definitions(${PLUGIN_NAME}
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
 )
+
+# ADD — CMakeLists.txt (root), after juce_add_plugin() when ${PLUGIN_NAME} exists
+target_compile_definitions(${PLUGIN_NAME}
+    PRIVATE
+        $<$<BOOL:${PLUGIN_EDITOR_RESIZABLE}>:PLUGIN_EDITOR_RESIZABLE=1>
+)
+
 
 # Link JUCE modules
 target_link_libraries(${PLUGIN_NAME}
